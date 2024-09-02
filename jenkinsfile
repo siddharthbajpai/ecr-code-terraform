@@ -21,7 +21,7 @@ pipeline {
             steps {
                 git credentialsId: 'Github',
                     branch: "${params.BRANCH}",
-                    url: 'git@github.com:armor-code/infra-automation.git'
+                    url: 'https://github.com/siddharthbajpai/ecr-code-terraform'
             }
         }
         stage('Generate tfvars') {
