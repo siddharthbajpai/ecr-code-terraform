@@ -1,23 +1,31 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to checkout')
-    }
     stages {
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-             
-                    git credentialsId: 'Github',
-                        branch: "${params.BRANCH}",
-                        url: 'https://github.com/siddharthbajpai/ecr-code-terraform'
-                
+                git 'https://github.com/your-repo/your-repo.git'
             }
         }
-    }
-    post {
-        always {
-            // Actions to be run after the pipeline execution, e.g., cleanup
-            echo 'Pipeline finished.'
+        stage('Terraform Init') {
+            steps {
+                script {
+                    sh 'terraform init'
+                }
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                script {
+                    sh 'terraform plan'
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    sh 'terraform apply -auto-approve'
+                }
+            }
         }
     }
 }
