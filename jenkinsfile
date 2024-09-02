@@ -6,12 +6,11 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                // Wrap the steps with ansiColor to enable color output
-                wrap([$class: 'AnsiColorBuildWrapper', colorMapName: 'xterm']) {
+             
                     git credentialsId: 'Github',
                         branch: "${params.BRANCH}",
                         url: 'https://github.com/siddharthbajpai/ecr-code-terraform'
-                }
+                
             }
         }
     }
