@@ -3,19 +3,7 @@ pipeline {
     options {
         ansiColor('xterm')
     }
-    parameters {
-        string(name: 'ENV', defaultValue: 'dev', description: 'Specify env to deploy')
-        string(name: 'BRANCH', defaultValue: 'dev.DEVOPS-1517', description: 'Specify branch name to deploy')
-        string(name: 'REGION', defaultValue: 'us-west-2', description: 'Region to deploy')
-        choice(name: 'ECS_cluster', choices: ['dev-ecs-task'], description: 'Choose ECS cluster name')
-        string(name: 'Task_Definition', defaultValue: '', description: 'Task Definition Name')
-        choice(name: 'Role', choices: ['arn:aws:iam::034025401910:role/service-role/dev_ecs-task'], description: 'ECS cluster role')
-        string(name: 'CPU', defaultValue: '1024', description: 'Required CPU to run TASK')
-        string(name: 'Memory', defaultValue: '3072', description: 'Required Memory to run TASK')
-        text(name: 'ECR_Repo_Names', defaultValue: '', description: 'Repo Names to create, one per line')
-        choice(name: 'Private_Subnet', choices: ['subnet-027a5dd542ef467b6'], description: 'ENV dedicated VPC subnets')
-        choice(name: 'Security_Group', choices: ['sg-0228f52beb36d4d8a'], description: 'ENV dedicated default SG')
-    }
+    
     stages {
         stage('Clone') {
             steps {
@@ -24,72 +12,4 @@ pipeline {
                     url: 'https://github.com/siddharthbajpai/ecr-code-terraform'
             }
         }
-        stage('Generate tfvars') {
-            steps {
-                script {
-                    // Convert ECR Repo Names text area into a list
-                    def ecrRepos = params.ECR_Repo_Names.readLines().collect { it.trim() }.findAll { !it.isEmpty() }
-                    
-                    def tfvarsContent = """
-ecr_repositories = ${ecrRepos.collect { '"${it}"' }.join(',\n')}
-                    """
-                    
-                    writeFile file: "terraform.tfvars", text: tfvarsContent
-                }
-            }
-        }
-        stage('Plan') {
-            steps {
-                script {
-                    def tfVars = [
-                        'ecs_cluster': params.ECS_cluster,
-                        'Task_Definition': params.Task_Definition,
-                        'CPU': params.CPU,
-                        'Memory': params.Memory,
-                        'Private_Subnet': params.Private_Subnet,
-                        'Security_Group': params.Security_Group,
-                        'Role': params.Role
-                    ].collect { k, v -> "--var ${k}=${v}" }.join(' ')
-                    
-                    sh """
-                    ls -la
-                    export AWS_DEFAULT_REGION="${params.REGION}"
-                    cd terraform/aws/modules/ecs-based-deployment/
-                    terraform init --backend-config=../../config/${params.ENV}/ecs-based-deployment.conf
-                    terraform plan --var-file=../../config/${params.ENV}/terraform.tfvars ${tfVars}
-                    """
-                }
-            }
-        }
-        stage('Apply') {
-            input {
-                message "Continue with plan?"
-            }
-            steps {
-                script {
-                    def tfVars = [
-                        'ecs_cluster': params.ECS_cluster,
-                        'Task_Definition': params.Task_Definition,
-                        'CPU': params.CPU,
-                        'Memory': params.Memory,
-                        'Private_Subnet': params.Private_Subnet,
-                        'Security_Group': params.Security_Group,
-                        'Role': params.Role
-                    ].collect { k, v -> "--var ${k}=${v}" }.join(' ')
-                    
-                    sh """
-                    ls -la
-                    export AWS_DEFAULT_REGION="${params.REGION}"
-                    cd terraform/aws/modules/ecs-based-deployment/
-                    terraform apply --auto-approve --var-file=../../config/${params.ENV}/terraform.tfvars ${tfVars}
-                    """
-                }
-            }
-        }
-    }
-    post {
-        always {
-            deleteDir()
-        }
-    }
-}
+      }
