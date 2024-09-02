@@ -3,7 +3,9 @@ pipeline {
     options {
         ansiColor('xterm')
     }
-    
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to checkout')
+    }
     stages {
         stage('Clone') {
             steps {
@@ -12,4 +14,12 @@ pipeline {
                     url: 'https://github.com/siddharthbajpai/ecr-code-terraform'
             }
         }
-      }
+        // Add additional stages as needed
+    }
+    // Optional: Add post actions if necessary
+    post {
+        always {
+            // Actions to be run after the pipeline execution, e.g., cleanup
+        }
+    }
+}
