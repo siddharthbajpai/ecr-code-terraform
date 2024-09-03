@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         AWS_REGION = 'us-west-2'
-       AWS_ROLE_ARN = 'arn:aws:iam::123456789012:role/YourRole' 
+       AWS_ROLE_ARN = '"arn:aws:iam::471112789726:role/terraform-role"' 
   }
     stages {
         stage('Checkout') {
