@@ -1,12 +1,12 @@
 terraform {
-  required_version = ">= 0.13.5" # introduction of Local Values configuration language feature
-}
-
-terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version = "~> 3.0"  # or whatever version you're using
     }
   }
+}
+
+provider "aws" {
+  region = "us-west-2"  # or your desired region
 }
