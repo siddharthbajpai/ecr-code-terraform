@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         AWS_REGION = 'us-west-2'
-       AWS_ROLE_ARN = '"arn:aws:iam::471112789726:role/ecr-role"' 
+       AWS_ROLE_ARN = '"use assume role here"' 
   }
     stages {
         stage('Checkout') {
